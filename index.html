@@ -18,27 +18,25 @@ label{display:block;font-size:13px;font-weight:700;margin:0 0 8px}.field{margin-
 <body>
 <div class="wrap">
 <header class="top"><div class="logo">▶</div><div><div class="brand">MOVI<span>ARA</span></div><div class="tag">Message Studio · Worldwide</div></div></header>
-<h1>Send a message</h1>
-<p class="intro">Choose a country, enter a phone number, and compose your MOVIARA message. Preview it before opening your phone's SMS app.</p>
+<h1>Payment Confirmation</h1>
+<p class="intro">Create a professional payment confirmation message, review the details, and send it to the customer by SMS.</p>
 <div class="grid">
 <section class="card">
-<div class="field"><label for="country">Country / calling code</label><select id="country"></select></div>
-<div class="field"><label for="phone">Phone number</label><input id="phone" type="tel" placeholder="Phone number" autocomplete="tel"></div><div class="field"><label for="email">Email address</label><input id="email" type="email" placeholder="name@example.com" autocomplete="email"></div>
-<div class="field"><label for="recipientName">Recipient name</label><input id="recipientName" type="text" placeholder="Full name"></div>
-<div class="field"><label for="amount">Amount (DEMO)</label><input id="amount" type="number" min="0" step="0.01" placeholder="0.00"></div>
-<div class="field"><label for="confirmation">Demo confirmation number</label><input id="confirmation" type="text" placeholder="TEST-123456"></div>
-<div class="field"><label for="message">Message</label><textarea id="message">🎬 Welcome to MOVIARA! Your movies. Your world. Discover entertainment today.</textarea></div>
-<button class="btn primary" id="send">Open SMS app</button>
-<button class="btn secondary" id="sendEmail">Open email app</button>
-<button class="btn secondary" id="sendBoth">SMS + Email (open both)</button>
-<button class="btn secondary" id="demoReceipt">Preview demo receipt</button>
+<div class="field"><label for="firstName">First Name</label><input id="firstName" type="text" placeholder="Customer first name" autocomplete="given-name"></div>
+<div class="field"><label for="lastName">Last Name</label><input id="lastName" type="text" placeholder="Customer last name" autocomplete="family-name"></div>
+<div class="field"><label for="phone">Phone Number</label><div class="phone-row"><select id="country"></select><input id="phone" type="tel" placeholder="Phone number" autocomplete="tel"></div></div>
+<div class="field"><label for="amount">Payment Amount</label><input id="amount" type="number" min="0" step="0.01" placeholder="0.00"></div>
+<div class="field"><label for="paymentMethod">Payment Method</label><select id="paymentMethod"><option value="">Select payment method</option><option>Cash</option><option>Cash App</option><option>Zelle</option><option>PayPal</option><option>Venmo</option><option>Credit/Debit Card</option><option>Bank Transfer</option><option>Other</option></select></div>
+<div class="field"><label for="reference">Payment Reference (Optional)</label><input id="reference" type="text" placeholder="Transaction or receipt number"></div>
+<div class="field"><label for="message">Confirmation Message</label><textarea id="message"></textarea></div>
+<button class="btn primary" id="send">Send Payment Confirmation</button>
 <button class="btn secondary" id="copy">Copy message</button>
-<p class="note">DEMO ONLY: This tool does not process payments or verify transfers. It opens your SMS or email app with recipient and message filled in. You must press Send in each app. Email can include MOVIARA branding; automatic simultaneous sending requires an email provider and backend.</p>
+<p class="note">This tool sends SMS confirmations through Twilio. Only send a payment confirmation after you have independently verified the payment. The date is added automatically.</p>
 </section>
 <section class="card">
-<p class="preview-label">MESSAGE PREVIEW</p>
-<div class="preview"><div class="phone-head"><div class="avatar">▶</div><div><div class="preview-name">MOVIARA</div><div class="preview-sub">Message preview</div></div></div><div class="bubble" id="preview"></div><div id="receipt" style="display:none;margin-top:14px;background:#fff;border-radius:16px;padding:14px;border:1px solid #ddd"><div style="text-align:center;color:#d71920;font-weight:900">MOVIARA · DEMO RECEIPT</div><div style="text-align:center;color:#777;font-size:12px;margin:6px 0 12px">TEST ONLY — NOT A REAL PAYMENT CONFIRMATION</div><div id="receiptDetails" style="line-height:1.7"></div></div></div>
-<p class="note">Email can include MOVIARA branding in its body. Ordinary SMS cannot carry the logo. Automatic simultaneous delivery requires connecting SMS/RCS and email services.</p>
+<p class="preview-label">SMS PREVIEW</p>
+<div class="preview"><div class="phone-head"><div class="avatar">▶</div><div><div class="preview-name">Payment Confirmation</div><div class="preview-sub">SMS preview</div></div></div><div class="bubble" id="preview"></div></div>
+<p class="note">Your confirmation includes the customer name, amount, payment method, optional reference, and today’s date. SMS delivery is handled securely through Twilio.</p>
 </section>
 </div>
 <div class="foot">MOVIARA Message Studio · Demo interface</div>
@@ -50,41 +48,83 @@ const country=document.getElementById('country');
 countries.forEach(([flag,name,code])=>{let o=document.createElement('option');o.value=code;o.textContent=`${flag} ${name} (+${code})`;country.appendChild(o)});
 country.value="1";
 const phone=document.getElementById('phone'), message=document.getElementById('message'), preview=document.getElementById('preview');
-function update(){preview.textContent=message.value||"Your message will appear here."}
-message.addEventListener('input',update);update();
-function getReceiptData(){
- const name=document.getElementById('recipientName').value.trim()||'Recipient';
- const amount=document.getElementById('amount').value||'0.00';
- const confirmation=document.getElementById('confirmation').value.trim()||'DEMO-'+Date.now().toString().slice(-6);
- const date=new Date().toLocaleDateString();
- const number=phone.value.trim();
- return {name,amount,confirmation,date,number};
+function todayText(){
+ return new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+}
+function update(){
+ const first=document.getElementById('firstName').value.trim();
+ const last=document.getElementById('lastName').value.trim();
+ const name=(first+' '+last).trim()||'Customer';
+ const amount=document.getElementById('amount').value.trim();
+ const method=document.getElementById('paymentMethod').value;
+ const ref=document.getElementById('reference').value.trim();
+ const date=todayText();
+ if(!message.value.trim()){
+   message.value=`Hello ${name},\\n\\nWe confirm that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\\n\\nPayment Date: ${date}${ref?'\\nReference: '+ref:''}\\n\\nThank you for your payment. We appreciate your business.`;
+ }
+ preview.textContent=message.value||'Your confirmation message will appear here.';
+}
+function buildMessage(){
+ const first=document.getElementById('firstName').value.trim();
+ const last=document.getElementById('lastName').value.trim();
+ const name=(first+' '+last).trim();
+ const amount=document.getElementById('amount').value.trim();
+ const method=document.getElementById('paymentMethod').value;
+ const ref=document.getElementById('reference').value.trim();
+ const date=todayText();
+ let text=message.value.trim();
+ if(!text){
+   text=`Hello ${name||'Customer'},\\n\\nThis is to confirm that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\\n\\nPayment Date: ${date}${ref?'\\nPayment Reference: '+ref:''}\\n\\nThank you for your payment. We appreciate your business.`;
+ }
+ return text;
 }
 function receiptText(){
- const r=getReceiptData();
- return `MOVIARA — DEMO RECEIPT\\nTEST ONLY — NOT A REAL PAYMENT CONFIRMATION\\n\\nRecipient: ${r.name}\\nPhone: ${r.number}\\nAmount: $${r.amount}\\nDate: ${r.date}\\nDemo reference: ${r.confirmation}\\n\\nThis is a demo receipt only. No payment was processed or verified.`;
+ const first=document.getElementById('firstName').value.trim();
+ const last=document.getElementById('lastName').value.trim();
+ const name=(first+' '+last).trim()||'Customer';
+ const amount=document.getElementById('amount').value.trim();
+ const method=document.getElementById('paymentMethod').value;
+ const ref=document.getElementById('reference').value.trim();
+ return `Payment Confirmation\\nCustomer: ${name}\\nAmount: ${amount? '$'+amount:'Not provided'}\\nPayment Method: ${method||'Not provided'}\\nPayment Date: ${todayText()}${ref?'\\nReference: '+ref:''}`;
 }
-function openSMS(){
- const digits=phone.value.replace(/\\D/g,''); if(!digits){alert('Enter a phone number first.');phone.focus();return;}
- const full='+'+country.value+digits;
- const body=encodeURIComponent(message.value+'\\n\\n'+receiptText());
- window.location.href=`sms:${full}?body=${body}`;
+function refreshPreview(){
+ const text=buildMessage();
+ preview.textContent=text;
 }
-function openEmail(){
- const recipient=document.getElementById('email').value.trim();
- if(!recipient){alert('Enter an email address first.');document.getElementById('email').focus();return;}
- const subject=encodeURIComponent('MOVIARA — Demo Receipt (Test Only)');
- const body=encodeURIComponent('🎬 MOVIARA\\nYour Movies. Your World.\\n\\n'+message.value+'\\n\\n'+receiptText());
- window.location.href=`mailto:${recipient}?subject=${subject}&body=${body}`;
+['firstName','lastName','amount','paymentMethod','reference','message'].forEach(id=>{
+ document.getElementById(id).addEventListener('input',refreshPreview);
+ document.getElementById(id).addEventListener('change',refreshPreview);
+});
+refreshPreview();
+async function openSMS(){
+ const digits=phone.value.replace(/\\D/g,'');
+ if(!digits){alert('Please enter the customer phone number.');phone.focus();return;}
+ const full=phone.value.trim().startsWith('+') ? phone.value.trim() : '+'+country.value+digits;
+ const first=document.getElementById('firstName').value.trim();
+ const last=document.getElementById('lastName').value.trim();
+ if(!first || !last){alert('Please enter the customer first and last name.');return;}
+ const sendBtn=document.getElementById('send');
+ sendBtn.disabled=true; sendBtn.textContent='Sending confirmation…';
+ try {
+   const response=await fetch('/api/send-sms',{
+     method:'POST',
+     headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({to:full,message:buildMessage()})
+   });
+   const data=await response.json().catch(()=>({}));
+   if(!response.ok) throw new Error(data.error||'SMS could not be sent.');
+   alert('Payment confirmation SMS sent successfully. Message SID: '+(data.sid||''));
+ } catch(error) {
+   alert('SMS sending failed: '+error.message);
+ } finally {
+   sendBtn.disabled=false; sendBtn.textContent='Send Payment Confirmation';
+ }
 }
 document.getElementById('send').addEventListener('click',openSMS);
-document.getElementById('sendEmail').addEventListener('click',openEmail);
-document.getElementById('sendBoth').addEventListener('click',()=>{
- if(!phone.value.trim()||!document.getElementById('email').value.trim()){alert('Enter both a phone number and email address.');return;}
- alert('Your SMS app will open. Send it, return to this page, then click Open email app to prepare the email.');
- openSMS();
+document.getElementById('copy').addEventListener('click',async()=>{
+ try{await navigator.clipboard.writeText(buildMessage());alert('Confirmation message copied!')}
+ catch(e){alert('Copy failed. Please select and copy the message manually.')}
 });
-document.getElementById('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(message.value);alert('Message copied!')}catch(e){alert('Copy failed. Select and copy the message manually.')}});
 </script>
 </body>
 </html>
