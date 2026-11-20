@@ -1,15 +1,16 @@
-// Vercel serverless function: securely sends SMS through Twilio.
+// Vercel serverless function: securely sends SMS through ClickSend.
 // Required Vercel environment variables:
-// TWILIO_ACCOUNT_SID, TWILIO_API_KEY, TWILIO_API_SECRET, TWILIO_PHONE_NUMBER
+// CLICKSEND_USERNAME, CLICKSEND_API_KEY
+// Optional: CLICKSEND_FROM (sender ID or phone number, if supported for your account/region)
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { TWILIO_ACCOUNT_SID, TWILIO_API_KEY, TWILIO_API_SECRET, TWILIO_PHONE_NUMBER } = process.env;
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_API_KEY || !TWILIO_API_SECRET || !TWILIO_PHONE_NUMBER) {
-    return res.status(500).json({ error: "Twilio is not configured. Check the Vercel environment variables." });
+  const { CLICKSEND_USERNAME, CLICKSEND_API_KEY, CLICKSEND_FROM } = process.env;
+  if (!CLICKSEND_USERNAME || !CLICKSEND_API_KEY) {
+    return res.status(500).json({ error: "ClickSend is not configured. Check the Vercel environment variables." });
   }
 
   const { to, message } = req.body || {};
@@ -17,32 +18,38 @@ export default async function handler(req, res) {
   if (typeof message !== "string" || message.length > 1600) {
     return res.status(400).json({ error: "Message is too long. Keep it under 1600 characters." });
   }
-  const phone = String(to).replace(/[\s().-]/g, "");
-  if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
+  const phone = String(to).replace(/[\\s().-]/g, "");
+  if (!/^\\+[1-9]\\d{7,14}$/.test(phone)) {
     return res.status(400).json({ error: "Enter a valid international phone number, including country code." });
   }
 
   try {
-    const endpoint = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
-    const auth = Buffer.from(`${TWILIO_API_KEY}:${TWILIO_API_SECRET}`).toString("base64");
-    const form = new URLSearchParams({ To: phone, From: TWILIO_PHONE_NUMBER, Body: message });
-    const twilioResponse = await fetch(endpoint, {
+    const auth = Buffer.from(`${CLICKSEND_USERNAME}:${CLICKSEND_API_KEY}`).toString("base64");
+    const payload = {
+      messages: [{
+        to: phone,
+        body: message,
+        source: "MOVIARA Message Studio",
+        ...(CLICKSEND_FROM ? { from: CLICKSEND_FROM } : {})
+      }]
+    };
+    const response = await fetch("https://rest.clicksend.com/v3/sms/send", {
       method: "POST",
       headers: {
         Authorization: `Basic ${auth}`,
-        "Content-Type": "application/x-www-form-urlencoded"
+        "Content-Type": "application/json"
       },
-      body: form
+      body: JSON.stringify(payload)
     });
-    const result = await twilioResponse.json();
-    if (!twilioResponse.ok) {
-      return res.status(twilioResponse.status).json({
-        error: result.message || "Twilio rejected the SMS request.",
-        code: result.code
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || result?.response_code && result.response_code !== "SUCCESS") {
+      return res.status(response.status || 400).json({
+        error: result?.response_msg || result?.data?.messages?.[0]?.message || "ClickSend rejected the SMS request."
       });
     }
-    return res.status(200).json({ success: true, sid: result.sid, status: result.status });
+    const sms = result?.data?.messages?.[0] || {};
+    return res.status(200).json({ success: true, message_id: sms.message_id, status: sms.status });
   } catch (error) {
-    return res.status(500).json({ error: "Unable to contact Twilio. Please try again." });
+    return res.status(500).json({ error: "Unable to contact ClickSend. Please try again." });
   }
 }
