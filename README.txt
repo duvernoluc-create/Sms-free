@@ -1,12 +1,12 @@
-MOVIARA PAYMENT CONFIRMATION
+MOVIARA Message Studio — ClickSend SMS
 
-Vercel environment variables (Secret):
-- TWILIO_ACCOUNT_SID
-- TWILIO_API_KEY
-- TWILIO_API_SECRET
-- TWILIO_PHONE_NUMBER
+Deploy this folder to Vercel.
 
-The page is English-only and collects:
-First Name, Last Name, Phone Number, Payment Amount, Payment Method, optional Payment Reference, and Confirmation Message.
-Today's date is inserted automatically into the generated confirmation.
-Only send payment confirmations after independently verifying the payment.
+Vercel Environment Variables:
+- CLICKSEND_USERNAME: your ClickSend account username
+- CLICKSEND_API_KEY: your ClickSend API key
+- CLICKSEND_FROM (optional): sender ID/number if supported and configured for your account/region
+
+Do not put API credentials in index.html or share them publicly.
+
+After adding/changing environment variables, redeploy the project in Vercel.
