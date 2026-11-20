@@ -24,16 +24,20 @@ label{display:block;font-size:13px;font-weight:700;margin:0 0 8px}.field{margin-
 <section class="card">
 <div class="field"><label for="country">Country / calling code</label><select id="country"></select></div>
 <div class="field"><label for="phone">Phone number</label><input id="phone" type="tel" placeholder="Phone number" autocomplete="tel"></div><div class="field"><label for="email">Email address</label><input id="email" type="email" placeholder="name@example.com" autocomplete="email"></div>
+<div class="field"><label for="recipientName">Recipient name</label><input id="recipientName" type="text" placeholder="Full name"></div>
+<div class="field"><label for="amount">Amount (DEMO)</label><input id="amount" type="number" min="0" step="0.01" placeholder="0.00"></div>
+<div class="field"><label for="confirmation">Demo confirmation number</label><input id="confirmation" type="text" placeholder="TEST-123456"></div>
 <div class="field"><label for="message">Message</label><textarea id="message">🎬 Welcome to MOVIARA! Your movies. Your world. Discover entertainment today.</textarea></div>
 <button class="btn primary" id="send">Open SMS app</button>
 <button class="btn secondary" id="sendEmail">Open email app</button>
 <button class="btn secondary" id="sendBoth">SMS + Email (open both)</button>
+<button class="btn secondary" id="demoReceipt">Preview demo receipt</button>
 <button class="btn secondary" id="copy">Copy message</button>
-<p class="note">This demo opens your SMS or email app with recipient and message filled in. You must press Send in each app. Email can include MOVIARA branding; automatic simultaneous sending requires an email provider and backend.</p>
+<p class="note">DEMO ONLY: This tool does not process payments or verify transfers. It opens your SMS or email app with recipient and message filled in. You must press Send in each app. Email can include MOVIARA branding; automatic simultaneous sending requires an email provider and backend.</p>
 </section>
 <section class="card">
 <p class="preview-label">MESSAGE PREVIEW</p>
-<div class="preview"><div class="phone-head"><div class="avatar">▶</div><div><div class="preview-name">MOVIARA</div><div class="preview-sub">Message preview</div></div></div><div class="bubble" id="preview"></div></div>
+<div class="preview"><div class="phone-head"><div class="avatar">▶</div><div><div class="preview-name">MOVIARA</div><div class="preview-sub">Message preview</div></div></div><div class="bubble" id="preview"></div><div id="receipt" style="display:none;margin-top:14px;background:#fff;border-radius:16px;padding:14px;border:1px solid #ddd"><div style="text-align:center;color:#d71920;font-weight:900">MOVIARA · DEMO RECEIPT</div><div style="text-align:center;color:#777;font-size:12px;margin:6px 0 12px">TEST ONLY — NOT A REAL PAYMENT CONFIRMATION</div><div id="receiptDetails" style="line-height:1.7"></div></div></div>
 <p class="note">Email can include MOVIARA branding in its body. Ordinary SMS cannot carry the logo. Automatic simultaneous delivery requires connecting SMS/RCS and email services.</p>
 </section>
 </div>
@@ -48,23 +52,36 @@ country.value="1";
 const phone=document.getElementById('phone'), message=document.getElementById('message'), preview=document.getElementById('preview');
 function update(){preview.textContent=message.value||"Your message will appear here."}
 message.addEventListener('input',update);update();
+function getReceiptData(){
+ const name=document.getElementById('recipientName').value.trim()||'Recipient';
+ const amount=document.getElementById('amount').value||'0.00';
+ const confirmation=document.getElementById('confirmation').value.trim()||'DEMO-'+Date.now().toString().slice(-6);
+ const date=new Date().toLocaleDateString();
+ const number=phone.value.trim();
+ return {name,amount,confirmation,date,number};
+}
+function receiptText(){
+ const r=getReceiptData();
+ return `MOVIARA — DEMO RECEIPT\\nTEST ONLY — NOT A REAL PAYMENT CONFIRMATION\\n\\nRecipient: ${r.name}\\nPhone: ${r.number}\\nAmount: $${r.amount}\\nDate: ${r.date}\\nDemo reference: ${r.confirmation}\\n\\nThis is a demo receipt only. No payment was processed or verified.`;
+}
 function openSMS(){
  const digits=phone.value.replace(/\\D/g,''); if(!digits){alert('Enter a phone number first.');phone.focus();return;}
  const full='+'+country.value+digits;
- window.location.href=`sms:${full}?body=${encodeURIComponent(message.value)}`;
+ const body=encodeURIComponent(message.value+'\\n\\n'+receiptText());
+ window.location.href=`sms:${full}?body=${body}`;
 }
 function openEmail(){
  const recipient=document.getElementById('email').value.trim();
  if(!recipient){alert('Enter an email address first.');document.getElementById('email').focus();return;}
- const subject=encodeURIComponent('A message from MOVIARA');
- const body=encodeURIComponent('🎬 MOVIARA\\nYour Movies. Your World.\\n\\n'+message.value+'\\n\\n— MOVIARA');
+ const subject=encodeURIComponent('MOVIARA — Demo Receipt (Test Only)');
+ const body=encodeURIComponent('🎬 MOVIARA\\nYour Movies. Your World.\\n\\n'+message.value+'\\n\\n'+receiptText());
  window.location.href=`mailto:${recipient}?subject=${subject}&body=${body}`;
 }
 document.getElementById('send').addEventListener('click',openSMS);
 document.getElementById('sendEmail').addEventListener('click',openEmail);
 document.getElementById('sendBoth').addEventListener('click',()=>{
  if(!phone.value.trim()||!document.getElementById('email').value.trim()){alert('Enter both a phone number and email address.');return;}
- alert('Your SMS app will open first. Send the SMS, return here, then click Open email app to send the branded email.');
+ alert('Your SMS app will open. Send it, return to this page, then click Open email app to prepare the email.');
  openSMS();
 });
 document.getElementById('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(message.value);alert('Message copied!')}catch(e){alert('Copy failed. Select and copy the message manually.')}});
