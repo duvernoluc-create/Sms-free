@@ -23,16 +23,18 @@ label{display:block;font-size:13px;font-weight:700;margin:0 0 8px}.field{margin-
 <div class="grid">
 <section class="card">
 <div class="field"><label for="country">Country / calling code</label><select id="country"></select></div>
-<div class="field"><label for="phone">Phone number</label><input id="phone" type="tel" placeholder="Phone number" autocomplete="tel"></div>
+<div class="field"><label for="phone">Phone number</label><input id="phone" type="tel" placeholder="Phone number" autocomplete="tel"></div><div class="field"><label for="email">Email address</label><input id="email" type="email" placeholder="name@example.com" autocomplete="email"></div>
 <div class="field"><label for="message">Message</label><textarea id="message">🎬 Welcome to MOVIARA! Your movies. Your world. Discover entertainment today.</textarea></div>
 <button class="btn primary" id="send">Open SMS app</button>
+<button class="btn secondary" id="sendEmail">Open email app</button>
+<button class="btn secondary" id="sendBoth">SMS + Email (open both)</button>
 <button class="btn secondary" id="copy">Copy message</button>
-<p class="note">This free demo opens your device's SMS app with the recipient and message filled in. It does not send automatically, and standard SMS cannot display the MOVIARA logo. Branded logo messaging requires a supported RCS/Business Messaging provider and backend integration.</p>
+<p class="note">This demo opens your SMS or email app with recipient and message filled in. You must press Send in each app. Email can include MOVIARA branding; automatic simultaneous sending requires an email provider and backend.</p>
 </section>
 <section class="card">
 <p class="preview-label">MESSAGE PREVIEW</p>
 <div class="preview"><div class="phone-head"><div class="avatar">▶</div><div><div class="preview-name">MOVIARA</div><div class="preview-sub">Message preview</div></div></div><div class="bubble" id="preview"></div></div>
-<p class="note">Preview only: the logo shown here is website branding. It won't be attached to an ordinary SMS.</p>
+<p class="note">Email can include MOVIARA branding in its body. Ordinary SMS cannot carry the logo. Automatic simultaneous delivery requires connecting SMS/RCS and email services.</p>
 </section>
 </div>
 <div class="foot">MOVIARA Message Studio · Demo interface</div>
@@ -46,12 +48,24 @@ country.value="1";
 const phone=document.getElementById('phone'), message=document.getElementById('message'), preview=document.getElementById('preview');
 function update(){preview.textContent=message.value||"Your message will appear here."}
 message.addEventListener('input',update);update();
-document.getElementById('send').addEventListener('click',()=>{
- const digits=phone.value.replace(/\D/g,''); if(!digits){alert('Enter a phone number first.');phone.focus();return;}
+function openSMS(){
+ const digits=phone.value.replace(/\\D/g,''); if(!digits){alert('Enter a phone number first.');phone.focus();return;}
  const full='+'+country.value+digits;
- const body=encodeURIComponent(message.value);
- const link=`sms:${full}?body=${body}`;
- window.location.href=link;
+ window.location.href=`sms:${full}?body=${encodeURIComponent(message.value)}`;
+}
+function openEmail(){
+ const recipient=document.getElementById('email').value.trim();
+ if(!recipient){alert('Enter an email address first.');document.getElementById('email').focus();return;}
+ const subject=encodeURIComponent('A message from MOVIARA');
+ const body=encodeURIComponent('🎬 MOVIARA\\nYour Movies. Your World.\\n\\n'+message.value+'\\n\\n— MOVIARA');
+ window.location.href=`mailto:${recipient}?subject=${subject}&body=${body}`;
+}
+document.getElementById('send').addEventListener('click',openSMS);
+document.getElementById('sendEmail').addEventListener('click',openEmail);
+document.getElementById('sendBoth').addEventListener('click',()=>{
+ if(!phone.value.trim()||!document.getElementById('email').value.trim()){alert('Enter both a phone number and email address.');return;}
+ alert('Your SMS app will open first. Send the SMS, return here, then click Open email app to send the branded email.');
+ openSMS();
 });
 document.getElementById('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(message.value);alert('Message copied!')}catch(e){alert('Copy failed. Select and copy the message manually.')}});
 </script>
