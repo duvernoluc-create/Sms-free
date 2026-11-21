@@ -60,7 +60,7 @@ function update(){
  const ref=document.getElementById('reference').value.trim();
  const date=todayText();
  if(!message.value.trim()){
-   message.value=`Hello ${name},\\n\\nWe confirm that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\\n\\nPayment Date: ${date}${ref?'\\nReference: '+ref:''}\\n\\nThank you for your payment. We appreciate your business.`;
+   message.value=`Hello ${name},\n\nWe confirm that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\n\nPayment Date: ${date}${ref?'\nReference: '+ref:''}\n\nThank you for your payment. We appreciate your business.`;
  }
  preview.textContent=message.value||'Your confirmation message will appear here.';
 }
@@ -74,7 +74,7 @@ function buildMessage(){
  const date=todayText();
  let text=message.value.trim();
  if(!text){
-   text=`Hello ${name||'Customer'},\\n\\nThis is to confirm that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\\n\\nPayment Date: ${date}${ref?'\\nPayment Reference: '+ref:''}\\n\\nThank you for your payment. We appreciate your business.`;
+   text=`Hello ${name||'Customer'},\n\nThis is to confirm that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\n\nPayment Date: ${date}${ref?'\nPayment Reference: '+ref:''}\n\nThank you for your payment. We appreciate your business.`;
  }
  return text;
 }
@@ -85,7 +85,7 @@ function receiptText(){
  const amount=document.getElementById('amount').value.trim();
  const method=document.getElementById('paymentMethod').value;
  const ref=document.getElementById('reference').value.trim();
- return `Payment Confirmation\\nCustomer: ${name}\\nAmount: ${amount? '$'+amount:'Not provided'}\\nPayment Method: ${method||'Not provided'}\\nPayment Date: ${todayText()}${ref?'\\nReference: '+ref:''}`;
+ return `Payment Confirmation\nCustomer: ${name}\nAmount: ${amount? '$'+amount:'Not provided'}\nPayment Method: ${method||'Not provided'}\nPayment Date: ${todayText()}${ref?'\nReference: '+ref:''}`;
 }
 function refreshPreview(){
  const text=buildMessage();
@@ -97,7 +97,7 @@ function refreshPreview(){
 });
 refreshPreview();
 async function openSMS(){
- const digits=phone.value.replace(/\\D/g,'');
+ const digits=phone.value.replace(/\D/g,'');
  if(!digits){alert('Please enter the customer phone number.');phone.focus();return;}
  const full=phone.value.trim().startsWith('+') ? phone.value.trim() : '+'+country.value+digits;
  const first=document.getElementById('firstName').value.trim();
@@ -113,7 +113,7 @@ async function openSMS(){
    });
    const data=await response.json().catch(()=>({}));
    if(!response.ok) throw new Error(data.error||'SMS could not be sent.');
-   alert('Payment confirmation SMS sent successfully. Message SID: '+(data.sid||''));
+   alert('Payment confirmation SMS sent successfully. ClickSend ID: '+(data.message_id||''));
  } catch(error) {
    alert('SMS sending failed: '+error.message);
  } finally {
