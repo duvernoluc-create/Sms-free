@@ -17,12 +17,12 @@ module.exports = async (req, res) => {
   if (!selected.length)
     return res.status(400).json({ error: "Select a valid messaging channel." });
 
-  const phone = String(to.phone || "").replace(/[\\s().-]/g, "");
+  const phone = String(to.phone || "").replace(/[\s().-]/g, "");
   const email = String(to.email || "").trim();
   if (selected.some(c => c === "SMS" || c === "WHATSAPP") &&
-      !/^\\+[1-9]\\d{7,14}$/.test(phone))
+      !/^\+[1-9]\d{7,14}$/.test(phone))
     return res.status(400).json({ error: "Enter a valid international phone number with country code, such as +18095551234." });
-  if (selected.includes("EMAIL") && (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || !subject))
+  if (selected.includes("EMAIL") && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !subject))
     return res.status(400).json({ error: "A valid email and subject are required. Email sending is not configured yet." });
 
   if (selected.includes("EMAIL"))
