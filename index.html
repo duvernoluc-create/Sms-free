@@ -31,15 +31,15 @@ label{display:block;font-size:13px;font-weight:700;margin:0 0 8px}.field{margin-
 <div class="field"><label for="message">Confirmation Message</label><textarea id="message"></textarea></div>
 <button class="btn primary" id="send">Send Payment Confirmation</button>
 <button class="btn secondary" id="copy">Copy message</button>
-<p class="note">This tool sends SMS confirmations through Twilio. Only send a payment confirmation after you have independently verified the payment. The date is added automatically.</p>
+<p class="note">SMS requests are submitted securely through ClickSend. Delivery depends on the recipient mobile carrier and destination-country support. Verify payment before sending. The date is added automatically.</p>
 </section>
 <section class="card">
 <p class="preview-label">SMS PREVIEW</p>
 <div class="preview"><div class="phone-head"><div class="avatar" id="previewAvatar">▶</div><div><div class="preview-name" id="previewName">Payment Confirmation</div><div class="preview-sub">SMS preview</div></div></div><div class="bubble" id="preview"></div></div>
-<p class="note">The Zelle logo appears in the on-site preview only when Zelle is selected. Standard SMS messages cannot display logos; the logo is not sent with the SMS.</p>
+<p class="note">The Zelle logo appears in the on-site preview only when Zelle is selected. Standard SMS messages cannot display logos; the logo is not sent with the SMS. ClickSend may accept an SMS request without confirming delivery. Check ClickSend SMS History for the final status, especially for Dominican Republic numbers.</p>
 </section>
 </div>
-<div class="foot">MOVIARA Message Studio · Demo interface</div>
+<div class="foot">MOVIARA Message Studio · Secure SMS messaging</div>
 </div>
 <script>
 const countries=[
@@ -60,7 +60,7 @@ function update(){
  const ref=document.getElementById('reference').value.trim();
  const date=todayText();
  if(!message.value.trim()){
-   message.value=`Hello ${name},\n\nWe confirm that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\n\nPayment Date: ${date}${ref?'\nReference: '+ref:''}\n\nThank you for your payment. We appreciate your business.`;
+   message.value=`Hello ${name},\\n\\nWe confirm that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\\n\\nPayment Date: ${date}${ref?'\\nReference: '+ref:''}\\n\\nThank you for your payment. We appreciate your business.`;
  }
  preview.textContent=message.value||'Your confirmation message will appear here.';
 }
@@ -74,7 +74,7 @@ function buildMessage(){
  const date=todayText();
  let text=message.value.trim();
  if(!text){
-   text=`Hello ${name||'Customer'},\n\nThis is to confirm that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\n\nPayment Date: ${date}${ref?'\nPayment Reference: '+ref:''}\n\nThank you for your payment. We appreciate your business.`;
+   text=`Hello ${name||'Customer'},\\n\\nThis is to confirm that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\\n\\nPayment Date: ${date}${ref?'\\nPayment Reference: '+ref:''}\\n\\nThank you for your payment. We appreciate your business.`;
  }
  return text;
 }
@@ -85,7 +85,7 @@ function receiptText(){
  const amount=document.getElementById('amount').value.trim();
  const method=document.getElementById('paymentMethod').value;
  const ref=document.getElementById('reference').value.trim();
- return `Payment Confirmation\nCustomer: ${name}\nAmount: ${amount? '$'+amount:'Not provided'}\nPayment Method: ${method||'Not provided'}\nPayment Date: ${todayText()}${ref?'\nReference: '+ref:''}`;
+ return `Payment Confirmation\\nCustomer: ${name}\\nAmount: ${amount? '$'+amount:'Not provided'}\\nPayment Method: ${method||'Not provided'}\\nPayment Date: ${todayText()}${ref?'\\nReference: '+ref:''}`;
 }
 function refreshPreview(){
  const text=buildMessage();
@@ -97,14 +97,14 @@ function refreshPreview(){
 });
 refreshPreview();
 async function openSMS(){
- const digits=phone.value.replace(/\D/g,'');
+ const digits=phone.value.replace(/\\D/g,'');
  if(!digits){alert('Please enter the customer phone number.');phone.focus();return;}
  const full=phone.value.trim().startsWith('+') ? phone.value.trim() : '+'+country.value+digits;
  const first=document.getElementById('firstName').value.trim();
  const last=document.getElementById('lastName').value.trim();
  if(!first || !last){alert('Please enter the customer first and last name.');return;}
  const sendBtn=document.getElementById('send');
- sendBtn.disabled=true; sendBtn.textContent='Sending confirmation…';
+ sendBtn.disabled=true; sendBtn.textContent='Sending via ClickSend…';
  try {
    const response=await fetch('/api/send-sms',{
      method:'POST',
@@ -113,7 +113,7 @@ async function openSMS(){
    });
    const data=await response.json().catch(()=>({}));
    if(!response.ok) throw new Error(data.error||'SMS could not be sent.');
-   alert('Payment confirmation SMS sent successfully. ClickSend ID: '+(data.message_id||''));
+   alert('Your SMS request was accepted by ClickSend.\n\nMessage ID: '+(data.message_id||'Not provided')+'\nStatus: '+(data.status||'Submitted')+'\n\nThis does not guarantee delivery. Check ClickSend SMS History for the final delivery status, especially for Dominican Republic numbers.');
  } catch(error) {
    alert('SMS sending failed: '+error.message);
  } finally {
