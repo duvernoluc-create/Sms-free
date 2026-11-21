@@ -12,34 +12,51 @@ h1{font-size:clamp(26px,5vw,40px);margin:0 0 8px}.intro{color:var(--muted);margi
 .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.card{background:linear-gradient(180deg,#181820,#121218);border:1px solid var(--border);border-radius:20px;padding:22px;box-shadow:0 15px 50px #0004}
 label{display:block;font-size:13px;font-weight:700;margin:0 0 8px}.field{margin-bottom:18px}input,select,textarea{width:100%;background:#0d0d12;border:1px solid #34343f;border-radius:12px;padding:13px;color:#fff;font:inherit;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px #e5092018}select{cursor:pointer}textarea{resize:vertical;min-height:115px} .phone-row{display:grid;grid-template-columns:180px 1fr;gap:9px}.btn{border:0;border-radius:12px;padding:14px 18px;font-weight:800;cursor:pointer;font:inherit}.primary{background:var(--red);color:white;width:100%;box-shadow:0 8px 24px #e5092030}.primary:hover{background:#ff2038}.secondary{background:#24242d;color:white;border:1px solid var(--border);width:100%;margin-top:9px}.note{color:var(--muted);font-size:12px;line-height:1.5;margin-top:12px}
 .preview{background:#f1f1f3;color:#111;border-radius:20px;padding:18px;min-height:360px}.phone-head{display:flex;align-items:center;gap:10px;border-bottom:1px solid #d7d7dc;padding-bottom:13px;margin-bottom:16px}.avatar{background:#d71920;color:#fff;border-radius:12px;width:42px;height:42px;display:grid;place-items:center;font-size:21px;font-weight:900}.avatar{transition:background .2s ease}.avatar.cashapp{background:#00d632;color:#052b11}.avatar.zelle{background:#6d1ed4;font-size:14px;letter-spacing:-.5px}.avatar.paypal{background:#003087}.avatar.venmo{background:#008cff}.avatar.card{background:linear-gradient(135deg,#1a1f71,#eb001b)}.avatar.bank{background:#2864c7}.avatar.other{background:#555}.preview-name{font-weight:800}.preview-sub{font-size:12px;color:#777}.bubble{background:#fff;border-radius:18px 18px 18px 5px;padding:14px;box-shadow:0 2px 7px #0001;line-height:1.5;white-space:pre-wrap;word-break:break-word}.preview-label{color:var(--muted);font-size:12px;margin:0 0 10px}.foot{color:var(--muted);text-align:center;font-size:12px;margin-top:22px}
-@media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:20px 14px}.card{padding:18px}.phone-row{grid-template-columns:1fr 1fr}}
+
+.channels{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.channel-option{margin:0;cursor:pointer}.channel-option input{position:absolute;opacity:0;width:1px;height:1px}.channel-option span{display:flex;justify-content:center;align-items:center;min-height:48px;padding:10px;border:1px solid #34343f;border-radius:12px;background:#0d0d12;font-size:13px;transition:.2s}.channel-option input:checked+span{border-color:var(--red);background:#e5092018;box-shadow:0 0 0 2px #e5092020}.success-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;background:#000b;backdrop-filter:blur(8px);z-index:1000}.success-overlay.show{display:flex;animation:fadeIn .22s ease}.success-card{max-width:420px;width:100%;background:#17171f;border:1px solid #34343f;border-radius:24px;padding:28px;text-align:center;box-shadow:0 30px 100px #0008;animation:popIn .35s cubic-bezier(.2,.8,.2,1)}.success-check{width:76px;height:76px;margin:0 auto 16px;border-radius:50%;display:grid;place-items:center;background:#14b86b22;color:#35df91;font-size:42px;font-weight:900;border:2px solid #35df91;animation:checkPulse .55s ease}.success-card h2{margin:0 0 9px;font-size:25px}.success-card p{color:#c7c7d0;line-height:1.5}.success-detail{margin:15px 0;padding:12px;border-radius:12px;background:#101016;color:#aaa;font-size:12px;line-height:1.5}.success-card .primary{margin-top:5px}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes popIn{from{transform:translateY(18px) scale(.94);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}@keyframes checkPulse{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+
+
+.status-icon.error{background:#e5092018;color:#ff6576;border-color:#ff6576}
+.status-card.error .primary{background:#e50920}
+.channel-option span{font-weight:700}
+.send-status{display:none;margin:12px 0;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.45}
+.send-status.show{display:block;animation:fadeIn .2s ease}
+.send-status.success{background:#0d2b1e;color:#8cf0bd;border:1px solid #207a4d}
+.send-status.error{background:#301318;color:#ffb1ba;border:1px solid #8e2938}
+button:disabled{opacity:.65;cursor:wait}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:20px 14px}.card{padding:18px}.phone-row{grid-template-columns:1fr 1fr}.channels{grid-template-columns:1fr 1fr 1fr}}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <header class="top"><div class="logo">▶</div><div><div class="brand">MOVI<span>ARA</span></div><div class="tag">Message Studio · Worldwide</div></div></header>
 <h1>Payment Confirmation</h1>
-<p class="intro">Create a professional payment confirmation message, review the details, and send it to the customer by SMS.</p>
+<p class="intro">Prepare a polished payment receipt and send it through your connected messaging channels. Review the message before sending.</p>
 <div class="grid">
 <section class="card">
 <div class="field"><label for="firstName">First Name</label><input id="firstName" type="text" placeholder="Customer first name" autocomplete="given-name"></div>
 <div class="field"><label for="lastName">Last Name</label><input id="lastName" type="text" placeholder="Customer last name" autocomplete="family-name"></div>
-<div class="field"><label for="phone">Phone Number</label><div class="phone-row"><select id="country"></select><input id="phone" type="tel" placeholder="Phone number" autocomplete="tel"></div></div>
+<div class="field"><label for="phone">Phone Number (SMS / WhatsApp)</label><div class="phone-row"><select id="country"></select><input id="phone" type="tel" placeholder="Phone number" autocomplete="tel"></div></div>
+<div class="field"><label for="email">Customer Email (optional)</label><input id="email" type="email" placeholder="customer@example.com" autocomplete="email"></div>
+<div class="field"><label for="emailSubject">Email Subject</label><input id="emailSubject" type="text" value="Payment Confirmation" placeholder="Payment Confirmation"></div>
+<div class="field"><label>Send through</label><div class="channels"><label class="channel-option"><input type="checkbox" name="channel" value="SMS" checked><span>📱 SMS</span></label><label class="channel-option"><input type="checkbox" name="channel" value="WHATSAPP"><span>🟢 WhatsApp</span></label><label class="channel-option"><input type="checkbox" name="channel" value="EMAIL"><span>✉️ Email</span></label></div></div>
 <div class="field"><label for="amount">Payment Amount</label><input id="amount" type="number" min="0" step="0.01" placeholder="0.00"></div>
 <div class="field"><label for="paymentMethod">Payment Method</label><select id="paymentMethod"><option value="">Select payment method</option><option>Cash</option><option>Cash App</option><option>Zelle</option><option>PayPal</option><option>Venmo</option><option>Credit/Debit Card</option><option>Bank Transfer</option><option>Other</option></select></div>
 <div class="field"><label for="reference">Payment Reference (Optional)</label><input id="reference" type="text" placeholder="Transaction or receipt number"></div>
 <div class="field"><label for="message">Confirmation Message</label><textarea id="message"></textarea></div>
 <button class="btn primary" id="send">Send Payment Confirmation</button>
 <button class="btn secondary" id="copy">Copy message</button>
-<p class="note">SMS requests are submitted securely through Unlimited Messaging. Verify payment before sending. The date is added automatically. Free-plan SMS may include the UnlimitedMessaging.app footer.</p>
+<p class="note">Verify the payment before sending. Your message is submitted through Unlimited Messaging. Submission is not the same as confirmed delivery. Free-plan messages may include the provider footer.</p>
 </section>
 <section class="card">
-<p class="preview-label">SMS PREVIEW</p>
-<div class="preview"><div class="phone-head"><div class="avatar" id="previewAvatar">▶</div><div><div class="preview-name" id="previewName">Payment Confirmation</div><div class="preview-sub">SMS preview</div></div></div><div class="bubble" id="preview"></div></div>
-<p class="note">The Zelle logo appears in the on-site preview only when Zelle is selected. Standard SMS messages cannot display logos; the logo is not sent with the SMS. The payment-method logo shown here is only a preview; standard SMS messages cannot display logos. Unlimited Messaging may accept a request before carrier delivery is confirmed.</p>
+<p class="preview-label">MESSAGE PREVIEW</p>
+<div class="preview"><div class="phone-head"><div class="avatar" id="previewAvatar">▶</div><div><div class="preview-name" id="previewName">Payment Confirmation</div><div class="preview-sub" id="previewChannel">Message preview</div></div></div><div class="bubble" id="preview"></div></div>
+<p class="note">This is a preview of the message text. Payment-method branding is not included in the message itself. Unlimited Messaging may accept a request before delivery is confirmed.</p>
 </section>
 </div>
-<div class="foot">MOVIARA Message Studio · Secure SMS messaging</div>
+<div class="foot">MOVIARA Message Studio · Secure messaging</div>
+<div class="success-overlay" id="successOverlay" aria-hidden="true"><div class="success-card status-card" id="statusCard"><div class="success-check status-icon" id="statusIcon">✓</div><h2 id="statusTitle">Message submitted</h2><p id="successText">Your message request was accepted by Unlimited Messaging.</p><div class="success-detail" id="successDetail"></div><button class="btn primary" id="closeSuccess">Done</button></div></div>
 </div>
 <script>
 const countries=[
@@ -60,10 +77,11 @@ function update(){
  const ref=document.getElementById('reference').value.trim();
  const date=todayText();
  if(!message.value.trim()){
-   message.value=`Hello ${name},\\n\\nWe confirm that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\\n\\nPayment Date: ${date}${ref?'\\nReference: '+ref:''}\\n\\nThank you for your payment. We appreciate your business.`;
+   message.value=`Hello ${name},\n\nWe confirm that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\n\nPayment Date: ${date}${ref?'\nReference: '+ref:''}\n\nThank you for your payment. We appreciate your business.`;
  }
  preview.textContent=message.value||'Your confirmation message will appear here.';
 }
+let customMessage=false;
 function buildMessage(){
  const first=document.getElementById('firstName').value.trim();
  const last=document.getElementById('lastName').value.trim();
@@ -72,9 +90,9 @@ function buildMessage(){
  const method=document.getElementById('paymentMethod').value;
  const ref=document.getElementById('reference').value.trim();
  const date=todayText();
- let text=message.value.trim();
+ let text=customMessage ? message.value.trim() : '';
  if(!text){
-   text=`Hello ${name||'Customer'},\\n\\nThis is to confirm that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\\n\\nPayment Date: ${date}${ref?'\\nPayment Reference: '+ref:''}\\n\\nThank you for your payment. We appreciate your business.`;
+   text=`Hello ${name||'Customer'},\n\nThis message confirms that your payment${amount?' of $'+amount:''} has been received${method?' via '+method:''}.\n\nPayment Date: ${date}${ref?'\nPayment Reference: '+ref:''}\n\nThank you for your payment. We appreciate your business.`;
  }
  return text;
 }
@@ -85,7 +103,7 @@ function receiptText(){
  const amount=document.getElementById('amount').value.trim();
  const method=document.getElementById('paymentMethod').value;
  const ref=document.getElementById('reference').value.trim();
- return `Payment Confirmation\\nCustomer: ${name}\\nAmount: ${amount? '$'+amount:'Not provided'}\\nPayment Method: ${method||'Not provided'}\\nPayment Date: ${todayText()}${ref?'\\nReference: '+ref:''}`;
+ return `Payment Confirmation\nCustomer: ${name}\nAmount: ${amount? '$'+amount:'Not provided'}\nPayment Method: ${method||'Not provided'}\nPayment Date: ${todayText()}${ref?'\nReference: '+ref:''}`;
 }
 function updatePaymentBrand(){
  const method=document.getElementById('paymentMethod').value;
@@ -108,39 +126,62 @@ function updatePaymentBrand(){
 }
 function refreshPreview(){
  const text=buildMessage();
+ if(!customMessage) message.value=text;
  preview.textContent=text;
+ const selected=[...document.querySelectorAll('input[name="channel"]:checked')].map(el=>el.value);
+ document.getElementById('previewChannel').textContent=selected.length?selected.join(' + ')+' preview':'Select a channel';
  updatePaymentBrand();
 }
-['firstName','lastName','amount','paymentMethod','reference','message'].forEach(id=>{
+['firstName','lastName','amount','paymentMethod','reference','email','emailSubject','phone'].forEach(id=>{
  document.getElementById(id).addEventListener('input',refreshPreview);
  document.getElementById(id).addEventListener('change',refreshPreview);
 });
+message.addEventListener('input',()=>{customMessage=message.value.trim().length>0;refreshPreview();});
+document.querySelectorAll('input[name="channel"]').forEach(el=>el.addEventListener('change',refreshPreview));
+
 refreshPreview();
-async function openSMS(){
- const digits=phone.value.replace(/\\D/g,'');
- if(!digits){alert('Please enter the customer phone number.');phone.focus();return;}
+function showStatus(type,title,description,detail){
+ const overlay=document.getElementById('successOverlay');
+ const card=document.getElementById('statusCard');
+ const icon=document.getElementById('statusIcon');
+ card.classList.toggle('error',type==='error');
+ icon.classList.toggle('error',type==='error');
+ icon.textContent=type==='error'?'×':'✓';
+ document.getElementById('statusTitle').textContent=title;
+ document.getElementById('successText').textContent=description;
+ document.getElementById('successDetail').textContent=detail||'';
+ overlay.classList.add('show');overlay.setAttribute('aria-hidden','false');
+}
+function closeStatus(){const overlay=document.getElementById('successOverlay');overlay.classList.remove('show');overlay.setAttribute('aria-hidden','true');}
+async function sendMessage(){
+ const selected=[...document.querySelectorAll('input[name="channel"]:checked')].map(el=>el.value);
+ if(!selected.length){showStatus('error','Select a channel','Choose SMS, WhatsApp, or Email before sending.');return;}
+ const digits=phone.value.replace(/\D/g,'');
  const full=phone.value.trim().startsWith('+') ? phone.value.trim() : '+'+country.value+digits;
+ const email=document.getElementById('email').value.trim();
+ const subject=document.getElementById('emailSubject').value.trim()||'Payment Confirmation';
  const first=document.getElementById('firstName').value.trim();
  const last=document.getElementById('lastName').value.trim();
- if(!first || !last){alert('Please enter the customer first and last name.');return;}
- const sendBtn=document.getElementById('send');
- sendBtn.disabled=true; sendBtn.textContent='Sending via Unlimited Messaging…';
- try {
-   const response=await fetch('/api/send-sms',{
-     method:'POST',
-     headers:{'Content-Type':'application/json'},
-     body:JSON.stringify({to:full,message:buildMessage()})
-   });
-   const data=await response.json().catch(()=>({}));
-   if(!response.ok) throw new Error(data.error||'SMS could not be sent.');
-   alert('Your SMS request was accepted by Unlimited Messaging.\n\nMessage ID: '+(data.message_id||'Not provided')+'\nStatus: '+(data.status||'Submitted')+'\n\nThis does not guarantee delivery. Check your Unlimited Messaging inbox/status for delivery updates.');
- } catch(error) {
-   alert('SMS sending failed: '+error.message);
- } finally {
-   sendBtn.disabled=false; sendBtn.textContent='Send Payment Confirmation';
- }
+ if(!first||!last){showStatus('error','Customer name required','Please enter the customer’s first and last name.');return;}
+ if(selected.some(c=>c==='SMS'||c==='WHATSAPP')&&!digits){showStatus('error','Phone number required','Enter the customer’s phone number for SMS or WhatsApp.');phone.focus();return;}
+ if(selected.includes('EMAIL')&&!email){showStatus('error','Email required','Enter the customer’s email address.');document.getElementById('email').focus();return;}
+ if(selected.includes('EMAIL')&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showStatus('error','Invalid email','Please enter a valid email address.');return;}
+ const sendBtn=document.getElementById('send');sendBtn.disabled=true;sendBtn.textContent='Sending securely…';
+ try{
+  const payload={text:buildMessage(),channels:selected,subject};
+  if(selected.some(c=>c==='SMS'||c==='WHATSAPP'))payload.to={phone:full};
+  if(selected.includes('EMAIL'))payload.to={...(payload.to||{}),email};
+  const response=await fetch('/api/send-message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||'The message could not be submitted.');
+  showStatus('success','Message submitted successfully!', 'Unlimited Messaging accepted your request. This does not yet confirm delivery to the recipient.', 'Channel(s): '+selected.join(', ')+'\nRequest ID: '+(data.message_id||data.dispatch_id||'Not provided')+'\nOpen your Unlimited Messaging inbox/status to verify delivery.');
+ }catch(error){showStatus('error','Message not sent',error.message,'Please check your channel connection and configuration, then try again.');}
+ finally{sendBtn.disabled=false;sendBtn.textContent='Send Payment Confirmation';}
 }
-document.getElementById('send').addEventListener('click',openSMS);
+document.getElementById('send').addEventListener('click',sendMessage);
+document.getElementById('closeSuccess').addEventListener('click',closeStatus);
+document.getElementById('successOverlay').addEventListener('click',e=>{if(e.target.id==='successOverlay')closeStatus();});
+
 document.getElementById('copy').addEventListener('click',async()=>{
  try{await navigator.clipboard.writeText(buildMessage());alert('Confirmation message copied!')}
  catch(e){alert('Copy failed. Please select and copy the message manually.')}
