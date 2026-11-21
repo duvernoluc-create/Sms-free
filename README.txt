@@ -1,16 +1,28 @@
-MOVIARA Message Studio — Unlimited Messaging SMS
+MOVIARA Message Studio - Unlimited Messaging
 
-This Vercel API sends SMS through Unlimited Messaging.
+This project is a Vercel static site with a serverless API route.
 
-Required Vercel environment variable:
-- UM_API_KEY (create at https://app.unlimitedmessaging.app/api)
+Deployment:
+1. Upload this folder to GitHub and deploy it on Vercel.
+2. In Vercel Project Settings > Environment Variables, add:
+   UM_API_KEY = your Unlimited Messaging API key
+   Environment: Production (and Preview if desired)
+3. Redeploy after adding or changing environment variables.
+4. Connect the WhatsApp and email accounts in Unlimited Messaging:
+   https://app.unlimitedmessaging.app/accounts
+5. Create an API key at:
+   https://app.unlimitedmessaging.app/api
 
-Do not put the API key in frontend files or public repositories.
-Set UM_API_KEY in Vercel Project Settings > Environment Variables, then redeploy.
+Security:
+- Keep UM_API_KEY server-side only.
+- Never put the key in index.html or a public repository.
+- If the key leaks, revoke it in the Unlimited Messaging dashboard.
 
-Endpoint: POST /api/send-sms
-Body: { "to": "+15551234567", "message": "Your message" }
-
-The payment method's mark in the website preview is visual only. Standard SMS cannot display logos.
-On the Free Unlimited Messaging plan, text messages include the “Sent with UnlimitedMessaging.app” footer.
-API acceptance is not proof of delivery; check the Unlimited Messaging dashboard for message status.
+Channels:
+- SMS, WhatsApp, and Email are selectable in the site.
+- Email requires a customer email and subject.
+- SMS/WhatsApp require an international phone number.
+- The app shows a success animation when the API accepts the request,
+  but API acceptance is not the same as confirmed delivery. Verify delivery
+  in the Unlimited Messaging dashboard.
+- Free-plan messages may include the UnlimitedMessaging.app footer.
