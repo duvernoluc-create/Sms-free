@@ -3,7 +3,7 @@ module.exports = async (req, res) => {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
   try {
     const { phone, firstName, lastName, amount, paymentMethod, reference, date } = req.body || {};
-    if (!/^\\+[1-9]\\d{7,14}$/.test(phone || "")) return res.status(400).json({ error: "Valid international phone number required." });
+    if (!/^\+[1-9]\d{7,14}$/.test(phone || "")) return res.status(400).json({ error: "Valid international phone number required." });
     const sid = process.env.TWILIO_ACCOUNT_SID, key = process.env.TWILIO_API_KEY;
     const secret = process.env.TWILIO_API_SECRET || process.env.TWILIO_AUTH_SECRET;
     const token = process.env.TWILIO_AUTH_TOKEN;
