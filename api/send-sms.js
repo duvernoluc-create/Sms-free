@@ -18,8 +18,8 @@ export default async function handler(req, res) {
   if (typeof message !== "string" || message.length > 1600) {
     return res.status(400).json({ error: "Message is too long. Keep it under 1600 characters." });
   }
-  const phone = String(to).replace(/[\\s().-]/g, "");
-  if (!/^\\+[1-9]\\d{7,14}$/.test(phone)) {
+  const phone = String(to).replace(/[\s().-]/g, "");
+  if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
     return res.status(400).json({ error: "Enter a valid international phone number, including country code." });
   }
 
