@@ -1,34 +1,51 @@
-// Vercel serverless function: sends selected channels via Unlimited Messaging.
-// API key must remain server-side in UM_API_KEY.
-export default async function handler(req, res) {
+const twilio = require("twilio");
+
+module.exports = async (req, res) => {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-  const token = process.env.UM_API_KEY;
-  if (!token) return res.status(500).json({ error: "Unlimited Messaging is not configured. Set UM_API_KEY in Vercel." });
+
   const { to = {}, text, channels = [], subject } = req.body || {};
   if (!text || typeof text !== "string") return res.status(400).json({ error: "Message text is required." });
   if (text.length > 1600) return res.status(400).json({ error: "Message is too long. Keep it under 1600 characters." });
-  const allowed = ["SMS", "WHATSAPP", "EMAIL"];
-  const selected = [...new Set(channels)].filter(c => allowed.includes(c));
-  if (!selected.length) return res.status(400).json({ error: "Select at least one valid channel." });
-  const phone = String(to.phone || "").replace(/[\s().-]/g, "");
+
+  const selected = [...new Set(channels)].filter(c => ["WHATSAPP", "EMAIL"].includes(c));
+  if (!selected.length) return res.status(400).json({ error: "Select a valid channel." });
+
+  const phone = String(to.phone || "").replace(/[\\s().-]/g, "");
   const email = String(to.email || "").trim();
-  if (selected.some(c => c === "SMS" || c === "WHATSAPP") && !/^\+[1-9]\d{7,14}$/.test(phone))
-    return res.status(400).json({ error: "A valid international phone number is required for SMS or WhatsApp." });
+  if (selected.includes("WHATSAPP") && !/^\\+[1-9]\\d{7,14}$/.test(phone))
+    return res.status(400).json({ error: "A valid international phone number is required for WhatsApp." });
   if (selected.includes("EMAIL") && (!email || !email.includes("@") || !subject))
     return res.status(400).json({ error: "A valid email address and subject are required for email." });
-  const payload = { to: {}, text, channels: selected.map(channel => ({ channel })) };
-  if (selected.some(c => c === "SMS" || c === "WHATSAPP")) payload.to.phone = phone;
-  if (selected.includes("EMAIL")) { payload.to.email = email; payload.subject = subject; }
+
+  const results = {};
   try {
-    const response = await fetch("https://api.unlimitedmessaging.app/message", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) return res.status(response.status).json({ error: result?.message || result?.error || "Unlimited Messaging rejected the request." });
-    return res.status(200).json({ success: true, message_id: result?.id || result?.messageId, dispatch_id: result?.dispatchId, status: result?.status || "Submitted" });
-  } catch {
-    return res.status(500).json({ error: "Unable to contact Unlimited Messaging. Please try again." });
+    if (selected.includes("WHATSAPP")) {
+      const sid = process.env.TWILIO_ACCOUNT_SID;
+      const from = process.env.TWILIO_PHONE_NUMBER;
+      let client;
+      if (process.env.TWILIO_API_KEY && (process.env.TWILIO_API_SECRET || process.env.TWILIO_AUTH_SECRET || process.env.TWILIO_AUTH_TOKEN)) {
+        client = twilio(process.env.TWILIO_API_KEY, (process.env.TWILIO_API_SECRET || process.env.TWILIO_AUTH_SECRET || process.env.TWILIO_AUTH_TOKEN), { accountSid: sid });
+      } else if (process.env.TWILIO_AUTH_TOKEN) {
+        client = twilio(sid, process.env.TWILIO_AUTH_TOKEN);
+      } else {
+        return res.status(500).json({ error: "Twilio credentials are not configured. Check TWILIO_ACCOUNT_SID, TWILIO_API_KEY, and TWILIO_API_SECRET or TWILIO_AUTH_TOKEN." });
+      }
+      if (!sid || !from) return res.status(500).json({ error: "Set TWILIO_ACCOUNT_SID and TWILIO_PHONE_NUMBER in Vercel." });
+      const msg = await client.messages.create({
+        from: `whatsapp:${from}`,
+        to: `whatsapp:${phone}`,
+        body: text
+      });
+      results.WHATSAPP = { success: true, sid: msg.sid, status: msg.status };
+    }
+
+    if (selected.includes("EMAIL")) {
+      results.EMAIL = { success: false, error: "Email provider is not configured in this project." };
+    }
+
+    return res.status(200).json({ success: Object.values(results).every(r => r.success), results });
+  } catch (error) {
+    console.error("Channel send failed:", error.message);
+    return res.status(500).json({ error: error.message || "Unable to send message." });
   }
-}
+};
