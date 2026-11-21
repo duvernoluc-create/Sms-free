@@ -157,7 +157,14 @@ async function sendMessage(){
  const selected=[...document.querySelectorAll('input[name="channel"]:checked')].map(el=>el.value);
  if(!selected.length){showStatus('error','Select a channel','Choose at least one delivery channel before sending.');return;}
  const digits=phone.value.replace(/\D/g,'');
- const full=phone.value.trim().startsWith('+') ? phone.value.trim() : '+'+country.value+digits;
+ const rawPhone=phone.value.trim();
+ const rawDigits=rawPhone.replace(/\\D/g,'');
+ const selectedCode=String(country.value||'1');
+ let full;
+ if(rawPhone.startsWith('+')) full='+'+rawDigits;
+ else if(rawPhone.startsWith('00')) full='+'+rawDigits.slice(2);
+ else if(rawDigits.startsWith(selectedCode) && rawDigits.length > selectedCode.length+7) full='+'+rawDigits;
+ else full='+'+selectedCode+rawDigits;
  const email=document.getElementById('email').value.trim();
  const subject=document.getElementById('emailSubject').value.trim()||'Payment Confirmation';
  const first=document.getElementById('firstName').value.trim();
