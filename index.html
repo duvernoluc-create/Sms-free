@@ -40,7 +40,7 @@ button:disabled{opacity:.65;cursor:wait}
 <div class="field"><label for="phone">Phone Number (SMS / WhatsApp)</label><div class="phone-row"><select id="country"></select><input id="phone" type="tel" placeholder="Phone number" autocomplete="tel"></div></div>
 <div class="field"><label for="email">Customer Email (optional)</label><input id="email" type="email" placeholder="customer@example.com" autocomplete="email"></div>
 <div class="field"><label for="emailSubject">Email Subject</label><input id="emailSubject" type="text" value="Payment Confirmation" placeholder="Payment Confirmation"></div>
-<div class="field"><label>Send through</label><div class="channels"><label class="channel-option"><input type="checkbox" name="channel" value="SMS" checked><span>📱 SMS</span></label><label class="channel-option"><input type="checkbox" name="channel" value="WHATSAPP"><span>🟢 WhatsApp</span></label><label class="channel-option"><input type="checkbox" name="channel" value="EMAIL"><span>✉️ Email</span></label><label class="channel-option"><input type="checkbox" name="channel" value="VOICE_CALL"><span>📞 Voice Call</span></label></div></div>
+<div class="field"><label>Send through</label><div class="channels"><label class="channel-option"><input type="checkbox" name="channel" value="WHATSAPP"><span>🟢 WhatsApp</span></label><label class="channel-option"><input type="checkbox" name="channel" value="EMAIL"><span>✉️ Email</span></label><label class="channel-option"><input type="checkbox" name="channel" value="VOICE_CALL"><span>📞 Voice Call</span></label></div></div>
 <div class="field"><label for="amount">Payment Amount</label><input id="amount" type="number" min="0" step="0.01" placeholder="0.00"></div>
 <div class="field"><label for="paymentMethod">Payment Method</label><select id="paymentMethod"><option value="">Select payment method</option><option>Cash</option><option>Cash App</option><option>Zelle</option><option>PayPal</option><option>Venmo</option><option>Credit/Debit Card</option><option>Bank Transfer</option><option>Other</option></select></div>
 <div class="field"><label for="reference">Payment Reference (Optional)</label><input id="reference" type="text" placeholder="Transaction or receipt number"></div>
@@ -163,7 +163,7 @@ async function sendMessage(){
  const first=document.getElementById('firstName').value.trim();
  const last=document.getElementById('lastName').value.trim();
  if(!first||!last){showStatus('error','Customer name required','Please enter the customer’s first and last name.');return;}
- if(selected.some(c=>c==='SMS'||c==='WHATSAPP'||c==='VOICE_CALL')&&!digits){showStatus('error','Phone number required','Enter the customer’s phone number for SMS or WhatsApp.');phone.focus();return;}
+ if(selected.some(c=>c==='WHATSAPP'||c==='VOICE_CALL')&&!digits){showStatus('error','Phone number required','Enter the customer’s phone number for WhatsApp or Voice Call.');phone.focus();return;}
  if(selected.includes('EMAIL')&&!email){showStatus('error','Email required','Enter the customer’s email address.');document.getElementById('email').focus();return;}
  if(selected.includes('EMAIL')&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showStatus('error','Invalid email','Please enter a valid email address.');return;}
  const sendBtn=document.getElementById('send');sendBtn.disabled=true;sendBtn.textContent='Sending securely…';
@@ -172,7 +172,7 @@ async function sendMessage(){
   const regularChannels=selected.filter(c=>c!=='VOICE_CALL');
   if(regularChannels.length){
    const payload={text:buildMessage(),channels:regularChannels,subject};
-   if(regularChannels.some(c=>c==='SMS'||c==='WHATSAPP'))payload.to={phone:full};
+   if(regularChannels.some(c=>c==='WHATSAPP'))payload.to={phone:full};
    if(regularChannels.includes('EMAIL'))payload.to={...(payload.to||{}),email};
    const response=await fetch('/api/send-message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
    const data=await response.json().catch(()=>({}));
