@@ -22,8 +22,8 @@ module.exports = async (req, res) => {
     twiml.say({ voice: "alice", language: "en-US" }, `Once again, ${message}`);
 
     let client;
-    if (process.env.TWILIO_API_KEY && process.env.TWILIO_API_SECRET) {
-      client = twilio(process.env.TWILIO_API_KEY, process.env.TWILIO_API_SECRET, {
+    if (process.env.TWILIO_API_KEY && (process.env.TWILIO_API_SECRET || process.env.TWILIO_AUTH_SECRET || process.env.TWILIO_AUTH_TOKEN)) {
+      client = twilio(process.env.TWILIO_API_KEY, (process.env.TWILIO_API_SECRET || process.env.TWILIO_AUTH_SECRET || process.env.TWILIO_AUTH_TOKEN), {
         accountSid: process.env.TWILIO_ACCOUNT_SID
       });
     } else if (process.env.TWILIO_AUTH_TOKEN) {
