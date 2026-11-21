@@ -7,9 +7,9 @@ module.exports = async (req, res) => {
   if (text.length > 1600) return res.status(400).json({ error: "Message is too long. Keep it under 1600 characters." });
   const selected = [...new Set(channels)].filter(c => ["SMS", "WHATSAPP", "EMAIL"].includes(c));
   if (!selected.length) return res.status(400).json({ error: "Select a valid messaging channel." });
-  const phone = String(to.phone || "").replace(/[\\s().-]/g, "");
+  const phone = String(to.phone || "").replace(/[\s().-]/g, "");
   const email = String(to.email || "").trim();
-  if ((selected.includes("SMS") || selected.includes("WHATSAPP")) && !/^\\+[1-9]\\d{7,14}$/.test(phone))
+  if ((selected.includes("SMS") || selected.includes("WHATSAPP")) && !/^\+[1-9]\d{7,14}$/.test(phone))
     return res.status(400).json({ error: "Enter a valid international phone number with country code." });
   if (selected.includes("EMAIL") && (!email.includes("@") || !subject))
     return res.status(400).json({ error: "A valid email and subject are required." });
