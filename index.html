@@ -11,7 +11,7 @@
 h1{font-size:clamp(26px,5vw,40px);margin:0 0 8px}.intro{color:var(--muted);margin:0 0 24px;line-height:1.5}
 .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.card{background:linear-gradient(180deg,#181820,#121218);border:1px solid var(--border);border-radius:20px;padding:22px;box-shadow:0 15px 50px #0004}
 label{display:block;font-size:13px;font-weight:700;margin:0 0 8px}.field{margin-bottom:18px}input,select,textarea{width:100%;background:#0d0d12;border:1px solid #34343f;border-radius:12px;padding:13px;color:#fff;font:inherit;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px #e5092018}select{cursor:pointer}textarea{resize:vertical;min-height:115px} .phone-row{display:grid;grid-template-columns:180px 1fr;gap:9px}.btn{border:0;border-radius:12px;padding:14px 18px;font-weight:800;cursor:pointer;font:inherit}.primary{background:var(--red);color:white;width:100%;box-shadow:0 8px 24px #e5092030}.primary:hover{background:#ff2038}.secondary{background:#24242d;color:white;border:1px solid var(--border);width:100%;margin-top:9px}.note{color:var(--muted);font-size:12px;line-height:1.5;margin-top:12px}
-.preview{background:#f1f1f3;color:#111;border-radius:20px;padding:18px;min-height:360px}.phone-head{display:flex;align-items:center;gap:10px;border-bottom:1px solid #d7d7dc;padding-bottom:13px;margin-bottom:16px}.avatar{background:#d71920;color:#fff;border-radius:12px;width:42px;height:42px;display:grid;place-items:center;font-size:21px;font-weight:900}.avatar.zelle{background:#6d1ed4;font-size:14px;letter-spacing:-.5px}.zelle-wordmark{font-weight:900;letter-spacing:-1px}.preview-name{font-weight:800}.preview-sub{font-size:12px;color:#777}.bubble{background:#fff;border-radius:18px 18px 18px 5px;padding:14px;box-shadow:0 2px 7px #0001;line-height:1.5;white-space:pre-wrap;word-break:break-word}.preview-label{color:var(--muted);font-size:12px;margin:0 0 10px}.foot{color:var(--muted);text-align:center;font-size:12px;margin-top:22px}
+.preview{background:#f1f1f3;color:#111;border-radius:20px;padding:18px;min-height:360px}.phone-head{display:flex;align-items:center;gap:10px;border-bottom:1px solid #d7d7dc;padding-bottom:13px;margin-bottom:16px}.avatar{background:#d71920;color:#fff;border-radius:12px;width:42px;height:42px;display:grid;place-items:center;font-size:21px;font-weight:900}.avatar{transition:background .2s ease}.avatar.cashapp{background:#00d632;color:#052b11}.avatar.zelle{background:#6d1ed4;font-size:14px;letter-spacing:-.5px}.avatar.paypal{background:#003087}.avatar.venmo{background:#008cff}.avatar.card{background:linear-gradient(135deg,#1a1f71,#eb001b)}.avatar.bank{background:#2864c7}.avatar.other{background:#555}.preview-name{font-weight:800}.preview-sub{font-size:12px;color:#777}.bubble{background:#fff;border-radius:18px 18px 18px 5px;padding:14px;box-shadow:0 2px 7px #0001;line-height:1.5;white-space:pre-wrap;word-break:break-word}.preview-label{color:var(--muted);font-size:12px;margin:0 0 10px}.foot{color:var(--muted);text-align:center;font-size:12px;margin-top:22px}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:20px 14px}.card{padding:18px}.phone-row{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -31,12 +31,12 @@ label{display:block;font-size:13px;font-weight:700;margin:0 0 8px}.field{margin-
 <div class="field"><label for="message">Confirmation Message</label><textarea id="message"></textarea></div>
 <button class="btn primary" id="send">Send Payment Confirmation</button>
 <button class="btn secondary" id="copy">Copy message</button>
-<p class="note">SMS requests are submitted securely through ClickSend. Delivery depends on the recipient mobile carrier and destination-country support. Verify payment before sending. The date is added automatically.</p>
+<p class="note">SMS requests are submitted securely through Unlimited Messaging. Verify payment before sending. The date is added automatically. Free-plan SMS may include the UnlimitedMessaging.app footer.</p>
 </section>
 <section class="card">
 <p class="preview-label">SMS PREVIEW</p>
 <div class="preview"><div class="phone-head"><div class="avatar" id="previewAvatar">▶</div><div><div class="preview-name" id="previewName">Payment Confirmation</div><div class="preview-sub">SMS preview</div></div></div><div class="bubble" id="preview"></div></div>
-<p class="note">The Zelle logo appears in the on-site preview only when Zelle is selected. Standard SMS messages cannot display logos; the logo is not sent with the SMS. ClickSend may accept an SMS request without confirming delivery. Check ClickSend SMS History for the final status, especially for Dominican Republic numbers.</p>
+<p class="note">The Zelle logo appears in the on-site preview only when Zelle is selected. Standard SMS messages cannot display logos; the logo is not sent with the SMS. The payment-method logo shown here is only a preview; standard SMS messages cannot display logos. Unlimited Messaging may accept a request before carrier delivery is confirmed.</p>
 </section>
 </div>
 <div class="foot">MOVIARA Message Studio · Secure SMS messaging</div>
@@ -87,9 +87,29 @@ function receiptText(){
  const ref=document.getElementById('reference').value.trim();
  return `Payment Confirmation\\nCustomer: ${name}\\nAmount: ${amount? '$'+amount:'Not provided'}\\nPayment Method: ${method||'Not provided'}\\nPayment Date: ${todayText()}${ref?'\\nReference: '+ref:''}`;
 }
+function updatePaymentBrand(){
+ const method=document.getElementById('paymentMethod').value;
+ const avatar=document.getElementById('previewAvatar');
+ const name=document.getElementById('previewName');
+ const styles={
+  'Cash App':{label:'$',className:'cashapp',title:'Cash App'},
+  'Zelle':{label:'Z',className:'zelle',title:'Zelle'},
+  'PayPal':{label:'P',className:'paypal',title:'PayPal'},
+  'Venmo':{label:'V',className:'venmo',title:'Venmo'},
+  'Credit/Debit Card':{label:'▰',className:'card',title:'Card Payment'},
+  'Bank Transfer':{label:'🏦',className:'bank',title:'Bank Transfer'},
+  'Cash':{label:'$',className:'other',title:'Cash'},
+  'Other':{label:'✓',className:'other',title:'Other Payment'}
+ };
+ const brand=styles[method]||{label:'▶',className:'',title:'Payment Confirmation'};
+ avatar.textContent=brand.label;
+ avatar.className='avatar '+brand.className;
+ name.textContent=method ? brand.title+' Payment Confirmation' : 'Payment Confirmation';
+}
 function refreshPreview(){
  const text=buildMessage();
  preview.textContent=text;
+ updatePaymentBrand();
 }
 ['firstName','lastName','amount','paymentMethod','reference','message'].forEach(id=>{
  document.getElementById(id).addEventListener('input',refreshPreview);
@@ -104,7 +124,7 @@ async function openSMS(){
  const last=document.getElementById('lastName').value.trim();
  if(!first || !last){alert('Please enter the customer first and last name.');return;}
  const sendBtn=document.getElementById('send');
- sendBtn.disabled=true; sendBtn.textContent='Sending via ClickSend…';
+ sendBtn.disabled=true; sendBtn.textContent='Sending via Unlimited Messaging…';
  try {
    const response=await fetch('/api/send-sms',{
      method:'POST',
@@ -113,7 +133,7 @@ async function openSMS(){
    });
    const data=await response.json().catch(()=>({}));
    if(!response.ok) throw new Error(data.error||'SMS could not be sent.');
-   alert('Your SMS request was accepted by ClickSend.\n\nMessage ID: '+(data.message_id||'Not provided')+'\nStatus: '+(data.status||'Submitted')+'\n\nThis does not guarantee delivery. Check ClickSend SMS History for the final delivery status, especially for Dominican Republic numbers.');
+   alert('Your SMS request was accepted by Unlimited Messaging.\n\nMessage ID: '+(data.message_id||'Not provided')+'\nStatus: '+(data.status||'Submitted')+'\n\nThis does not guarantee delivery. Check your Unlimited Messaging inbox/status for delivery updates.');
  } catch(error) {
    alert('SMS sending failed: '+error.message);
  } finally {
