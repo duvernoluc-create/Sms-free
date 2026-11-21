@@ -1,12 +1,12 @@
 MOVIARA Message Studio — ClickSend SMS
 
-Deploy this folder to Vercel.
+Backend sends SMS requests through ClickSend.
+Required Vercel environment variables:
+- CLICKSEND_USERNAME
+- CLICKSEND_API_KEY
+Optional:
+- CLICKSEND_FROM (only if ClickSend supports/approves the sender for your account and destination)
 
-Vercel Environment Variables:
-- CLICKSEND_USERNAME: your ClickSend account username
-- CLICKSEND_API_KEY: your ClickSend API key
-- CLICKSEND_FROM (optional): sender ID/number if supported and configured for your account/region
-
-Do not put API credentials in index.html or share them publicly.
-
-After adding/changing environment variables, redeploy the project in Vercel.
+Important: API acceptance is not proof of delivery. Check ClickSend SMS History for final delivery status, especially for Dominican Republic destinations.
+Do not place API credentials in frontend files or public repositories.
+After updating files/environment variables, redeploy on Vercel.
